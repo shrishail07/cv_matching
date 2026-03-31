@@ -1,6 +1,6 @@
 import streamlit as st
 from admin_dashboard import admin_dashboard
-from hireing_dashboard import hiring_dashboard
+from hiring_dashboard import hiring_dashboard
 
 # -------------------------
 # PAGE CONFIG
