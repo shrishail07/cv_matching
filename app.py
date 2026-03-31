@@ -1,6 +1,6 @@
 import streamlit as st
 from admin_dashboard import admin_dashboard
-from hiring_dashboard import hiring_dashboard
+from hireing_dashboard import hiring_dashboard
 
 # -------------------------
 # PAGE CONFIG
@@ -22,6 +22,17 @@ if "logged_in" not in st.session_state:
 
 if "user_type" not in st.session_state:
     st.session_state.user_type = None
+
+if "user_name" not in st.session_state:
+    st.session_state.user_name = ""
+
+# -------------------------
+# PASSWORDS
+# Admin password:  admin@123
+# Manager password: manager@123
+# -------------------------
+ADMIN_PASSWORD   = "admin@123"
+MANAGER_PASSWORD = "manager@123"
 
 # Admin dashboard state
 if "admin_jd_list" not in st.session_state:
@@ -58,38 +69,37 @@ def login_page():
 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        user_type = st.selectbox(
+        name = st.text_input("Your Name", placeholder="Enter your name", key="login_name")
+
+        role = st.selectbox(
             "Login as",
             ["Select Role", "Admin", "Hiring Manager"],
             key="login_role_select"
         )
 
-        username = st.text_input("Username", key="login_username")
         password = st.text_input("Password", type="password", key="login_password")
 
         if st.button("Login", use_container_width=True):
-            if user_type == "Select Role":
+            if not name.strip():
+                st.error("Please enter your name.")
+            elif role == "Select Role":
                 st.error("Please select a role.")
-            elif not username or not password:
-                st.error("Please enter username and password.")
+            elif not password:
+                st.error("Please enter your password.")
+            elif role == "Admin" and password == ADMIN_PASSWORD:
+                st.session_state.logged_in = True
+                st.session_state.user_type = "admin"
+                st.session_state.user_name = name.strip()
+                go_to("admin_dashboard")
+                st.rerun()
+            elif role == "Hiring Manager" and password == MANAGER_PASSWORD:
+                st.session_state.logged_in = True
+                st.session_state.user_type = "hiring_manager"
+                st.session_state.user_name = name.strip()
+                go_to("hiring_dashboard")
+                st.rerun()
             else:
-                # Simple credential check — replace with real auth if needed
-                valid_users = {
-                    "admin": {"password": "admin123", "type": "admin"},
-                    "manager": {"password": "manager123", "type": "hiring_manager"},
-                }
-
-                user = valid_users.get(username.lower())
-                if user and user["password"] == password:
-                    st.session_state.logged_in = True
-                    st.session_state.user_type = user["type"]
-                    if user["type"] == "admin":
-                        go_to("admin_dashboard")
-                    else:
-                        go_to("hiring_dashboard")
-                    st.rerun()
-                else:
-                    st.error("Invalid username or password.")
+                st.error("Incorrect password for the selected role.")
 
 # -------------------------
 # ROUTER
