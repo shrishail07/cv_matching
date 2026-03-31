@@ -4,5 +4,5 @@ pymongo
 python-dotenv
 pdfplumber
 python-docx
-gtts
+gTTS
 openpyxl
